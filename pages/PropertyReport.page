@@ -1,0 +1,56 @@
+<!--
+ - Created by shake on 06.11.2022.
+ -->
+
+<apex:page id="PropertyReport" lightningStylesheets="true" standardController="Contact" extensions="PropertyOwnerController">
+    <style type="text/css">
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid black;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 24px;
+        }
+    </style>
+    <apex:pageBlock >
+        <h1 style="text-align:center;">Property Owner Info Report</h1>
+            Property Owner Name: {! Contact.Name} <br/>
+            Total Properties Price: {! Contact.Total_Property_Price__c}
+        <div>
+            <br/>
+        <table>
+            <thead style="background-color: lightskyblue;">
+            <tr>
+                <th>Property Type</th>
+                <th>Deals amount</th>
+                <th>Sum of type</th>
+                <th>Sum with percent</th>
+            </tr>
+            </thead>
+            <tr>
+                <td>Space</td>
+                <td>{!Space.dealsAmount}</td>
+                <td>{!Space.sumOfType}</td>
+                <td>{!Space.sumWithPercent}</td>
+            </tr>
+            <tr>
+                <td>Industrial</td>
+                <td>{!Industrial.dealsAmount}</td>
+                <td>{!Industrial.sumOfType}</td>
+                <td>{!Industrial.sumWithPercent}</td>
+            </tr>
+            <tr>
+                <td>Office</td>
+                <td>{!Office.dealsAmount}</td>
+                <td>{!Office.sumOfType}</td>
+                <td>{!Office.sumWithPercent}</td>
+            </tr>
+        </table>
+        </div>
+        <apex:image url="{!$Resource.Stompy}" width="140" height="100" style="float: right; margin-top: 30px; margin-bottom: 20px"/>
+    </apex:pageBlock>
+
+</apex:page>
