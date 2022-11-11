@@ -8,7 +8,8 @@ public with sharing class DealManager {
         delete [SELECT Id FROM Deal__c WHERE Id IN :ids];
     }
 
-    public static List<Deal__c> createDeals(Integer count,Id broker ,Id buyer,Id property,Id seller, Boolean push ){
+    public static List<Deal__c> createDeals(Integer count,Id broker ,Id buyer,Id property,
+            Id seller, String status, Boolean push ){
         List<Deal__c> newDeal = new List<Deal__c>();
 
         for(Integer i=0;i<count;i++){
@@ -17,6 +18,7 @@ public with sharing class DealManager {
             addDeal.Buyer__c = buyer;
             addDeal.Property__c = property;
             addDeal.Seller__c = seller;
+            addDeal.Status__c = status;
             newDeal.add(addDeal);
         }
         if(push) insert newDeal;
@@ -28,19 +30,19 @@ public with sharing class DealManager {
         return infoDeals;
     }
 
-    public static List<Deal__c> updateDeals(Integer count,Id broker ,Id buyer,Id property,Id seller, Boolean push ){
-        List<Deal__c> updatingDeal = new List<Deal__c>();
-
-        for(Integer i=0;i<count;i++){
-            Deal__c refreshDeal = new Deal__c();
-            refreshDeal.Broker__c = broker;
-            refreshDeal.Buyer__c = buyer;
-            refreshDeal.Property__c = property;
-            refreshDeal.Seller__c = seller;
-            updatingDeal.add(refreshDeal);
+    public static List<Deal__c> updateDeals( List<Id> ids, Id broker ,Id buyer,Id property, String status, Boolean push ){
+        List<Deal__c> updatingDeals = [SELECT Buyer__c, Property__c, Broker__c FROM Deal__c WHERE Id IN :ids];
+        for(Deal__c deal: updatingDeals){
+            deal.Buyer__c = buyer;
+            deal.Property__c = property;
+            deal.Broker__c = broker;
+            deal.Status__c = status;  
         }
-        if(push) update updatingDeal;
-        return updatingDeal;
+        if(push) update updatingDeals;
+        return updatingDeals;
+    }
+    public static List<Deal__c> readDealsByOwnerId(List<Id> id , String fields){
+        return Database.query('SELECT ' + fields + ' FROM Deal__c WHERE Seller__c  =:id ');
     }
 
 }

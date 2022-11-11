@@ -3,46 +3,44 @@
  */
 
 global with sharing class PropertyOwnerController {
-    private final Contact con;
+    private final Contact contact; //change name value and class
 
     public PropertyOwnerController(ApexPages.StandardController stdController) {
-        this.con = (Contact)stdController.getRecord();
+        this.contact = (Contact)stdController.getRecord();
     }
 
-    public DealWrapper getSpace(){
-        List<Deal__c> deals = [SELECT Id, Status__c, Closing_amount__c, Sale_price_Broker__c
-        FROM Deal__c
-        WHERE Seller__c =: con.Id
-        AND Property__r.RecordType.Name = 'Space'];
+    public List<DealWrapper> getDataForTable(){
+        String dataForTable = 'Id, Status__c, Closing_amount__c, Sale_price_Broker__c, Property__r.RecordType.Name ';
+        List<Deal__c>  wonDealList = DealManager.readDealsByOwnerId(new List<Id>{contact.Id}, dataForTable);
+        Map<String, List<Deal__c>> propertyRecordType = new Map<String, List<Deal__c>>();
 
-        DealWrapper wrappers = new DealWrapper(deals);
-        return wrappers;
-    }
-    public DealWrapper getIndustrial(){
-        List<Deal__c> deals = [SELECT Id, Status__c, Closing_amount__c, Sale_price_Broker__c
-        FROM Deal__c
-        WHERE Seller__c =: con.Id
-        AND Property__r.RecordType.Name = 'Industrial'];
+        for(Deal__c deal : wonDealList) {
 
-        DealWrapper wrappers = new DealWrapper(deals);
-        return wrappers;
-    }
-    public DealWrapper getOffice(){
-        List<Deal__c> deals = [SELECT Id, Status__c, Closing_amount__c, Sale_price_Broker__c
-        FROM Deal__c
-        WHERE Seller__c =: con.Id
-        AND Property__r.RecordType.Name = 'Office'];
+            List<Deal__c> dealWithPropertyType = propertyRecordType.get(deal.Property__r.RecordType.Name);
 
-        DealWrapper wrappers = new DealWrapper(deals);
+            if (dealWithPropertyType == null) {
+                propertyRecordType.put(deal.Property__r.RecordType.Name, new List<Deal__c>());
+            }
+
+            propertyRecordType.get(deal.Property__r.RecordType.Name).add(deal);
+        }
+
+        List<DealWrapper> wrappers = new List<DealWrapper>();
+        for (List<Deal__c> groupedDeals : propertyRecordType.values()) {
+            wrappers.add(new DealWrapper(groupedDeals));
+        }
+
         return wrappers;
     }
 
     public class DealWrapper {
+        public String propertyType {get;set;}
         public Integer dealsAmount {get;set;}
         public Decimal sumOfType {get;set;}
         public Decimal sumWithPercent {get;set;}
 
         public DealWrapper(List<Deal__c> deals) {
+            this.propertyType = '';
             this.dealsAmount = 0;
             this.sumOfType  = 0;
             this.sumWithPercent = 0;
@@ -50,6 +48,7 @@ global with sharing class PropertyOwnerController {
             for (Deal__c deal : deals) {
                 this.sumOfType  += deal.Closing_amount__c;
                 this.sumWithPercent += deal.Sale_price_Broker__c;
+                this.propertyType += deal.Property__r.RecordType.Name;
                 if (deal.Status__c == 'Closed Won') {
                     this.dealsAmount+= 1;
                 }
