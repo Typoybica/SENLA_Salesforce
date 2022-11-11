@@ -4,52 +4,32 @@
 
 <apex:page id="PropertyReport" lightningStylesheets="true" standardController="Contact" extensions="PropertyOwnerController">
     <style type="text/css">
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        table, th, td {
-            border: 1px solid black;
+
+        .border{
             text-align: center;
+            border: 2px solid grey !important;
             vertical-align: middle;
-            line-height: 24px;
+
+        }
+        .headerRow .headerTable{
+            text-align: center;
+            background-color: lightskyblue !important;
+            border: 2px solid grey !important; 
+        }
+        h1{
+            text-align:center
         }
     </style>
     <apex:pageBlock >
-        <h1 style="text-align:center;">Property Owner Info Report</h1>
+        <h1>Property Owner Info Report</h1>
             Property Owner Name: {! Contact.Name} <br/>
             Total Properties Price: {! Contact.Total_Property_Price__c}
-        <div>
-            <br/>
-        <table>
-            <thead style="background-color: lightskyblue;">
-            <tr>
-                <th>Property Type</th>
-                <th>Deals amount</th>
-                <th>Sum of type</th>
-                <th>Sum with percent</th>
-            </tr>
-            </thead>
-            <tr>
-                <td>Space</td>
-                <td>{!Space.dealsAmount}</td>
-                <td>{!Space.sumOfType}</td>
-                <td>{!Space.sumWithPercent}</td>
-            </tr>
-            <tr>
-                <td>Industrial</td>
-                <td>{!Industrial.dealsAmount}</td>
-                <td>{!Industrial.sumOfType}</td>
-                <td>{!Industrial.sumWithPercent}</td>
-            </tr>
-            <tr>
-                <td>Office</td>
-                <td>{!Office.dealsAmount}</td>
-                <td>{!Office.sumOfType}</td>
-                <td>{!Office.sumWithPercent}</td>
-            </tr>
-        </table>
-        </div>
+        <apex:pageBlockTable headerClass="headerTable"  value="{!dataForTable}" var="ownerInfo">
+            <apex:column headerValue="Property Type" styleClass="border" value="{!ownerInfo.propertyType}"/>
+            <apex:column headerValue="Deals Amount" styleClass="border" value="{!ownerInfo.sumOfType}"/>
+            <apex:column headerValue="Sum of type" styleClass="border" value="{!ownerInfo.dealsAmount}"/>
+            <apex:column headerValue="Sum with percent" styleClass="border" value="{!ownerInfo.sumWithPercent}"/>
+        </apex:pageBlockTable>
         <apex:image url="{!$Resource.Stompy}" width="140" height="100" style="float: right; margin-top: 30px; margin-bottom: 20px"/>
     </apex:pageBlock>
 
